@@ -16,17 +16,13 @@ class PermissionsSeeder extends Seeder
     {
       app()[PermissionRegistrar::class]->forgetCachedPermissions();
       
+      Permission::create(['name' => 'add users']);
       Permission::create(['name' => 'edit users']);
       Permission::create(['name' => 'delete users']);
-      Permission::create(['name' => 'add users']);
-
-      Permission::create(['name' => 'edit news']);
-      Permission::create(['name' => 'delete news']);
-      Permission::create(['name' => 'publish news']);
 
       Permission::create(['name' => 'add banks']);
-      Permission::create(['name' => 'delete banks']);
       Permission::create(['name' => 'edit banks']);
+      Permission::create(['name' => 'delete banks']);
 
     
       $role1 = Role::create(['name' => 'super-admin']);
@@ -39,26 +35,26 @@ class PermissionsSeeder extends Seeder
       $role2->givePermissionTo('add users');
       $role2->givePermissionTo('delete users');
 
-      $role3->givePermissionTo('edit news');
-      $role3->givePermissionTo('publish news');
-      $role3->givePermissionTo('delete news');
+      $role3->givePermissionTo('add banks');
+      $role3->givePermissionTo('edit banks');
+      $role3->givePermissionTo('delete banks');
 
       $user = Factory(User::class)->create([
         'name' => 'Admin User',
         'email' => 'admin@admin.com',
       ]);
-      $user->assignRole($role1);
+      $user->assignRole($role2);
 
       $user = Factory(User::class)->create([
         'name' => 'Super Admin',
-        'email' => 'moderator@mod.com',
+        'email' => 'spadmin@mod.com',
       ]);
-      $user->assignRole($role4);
+      $user->assignRole($role1);
 
       $user = Factory(User::class)->create([
-        'name' => 'Moderator Admin',
-        'email' => 'super@super.com',
+        'name' => 'Moderator',
+        'email' => 'moderator@moderator.com',
       ]);
-      $user->assignRole($role2);
+      $user->assignRole($role3);
     }
 }

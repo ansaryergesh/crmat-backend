@@ -22,6 +22,9 @@ class CreateBanksTable extends Migration
             $table->integer('srok_min');
             $table->integer('srok_max');
             $table->double('stavka');
+            $table->double('approve_percent');
+            $table->boolean('auction')->default(false);
+            $table->integer('sell_quantity')->default(0);
             $table->double('rate')->nullable();
             $table->timestamps();
         });

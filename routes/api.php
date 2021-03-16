@@ -20,3 +20,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/test',[BankController::class,'test']);
+Route::post('/banks',[BankController::class,'add']);
