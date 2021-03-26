@@ -18,7 +18,11 @@ use App\Http\Controllers\BankController;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user(); 
 });
-
+Route::put('/editOwn', [UserController::class, 'editOwn']);
+Route::put('/changePassword', [UserController::class, 'changePassword']);
+Route::get('/logout',[UserController::class,'logout']);
+Route::post('/login', [UserController::class, 'login']);
+Route::get('/users', [UserController::class, 'index']);
 Route::get('/test',[BankController::class,'test']);
 Route::get('/banks', [BankController::class, 'banks']);
 Route::post('/banks',[BankController::class,'add']);
