@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 use DB;
 use App\User;
+use App\Http\Resources\BankDetailResource;
+use App\Model\Bank;
+use App\BankDetail;
 use Carbon\Carbon;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -18,7 +21,105 @@ class BankController extends Controller
       return response()->json($result);
     }
 
+    public function bankResult(Request $request) {
+      $srok = $request->input('srok');
+      $id_bank = $request->input('id_bank');
+      $amount = $request->input('amount');
+      $rate = $request->input('rate');
+      $approve = $request->input('approve');
+      $sell = $request->input('sell');
+      $stavka = $request->input('stavka');
+
+      $banks = DB::table('banks');
+      if($srok) {
+        $banks = DB::table('banks')->where('srok_min','<=', $srok)->where('srok_max', '>=', $srok);
+      }
+      if($amount) {
+        $banks = DB::table('banks')->where('amount_min','<=', $amount)->where('amount_max', '>=', $amount);
+      }
+
+      $banks = $banks->count();
+      $result['count'] = $banks;
+
+      return response()->json($result);
+    }
+
+    public function banks(Request $request) {
+      $per_page = $request->input('per_page');
+      $srok = $request->input('srok');
+      $id_bank = $request->input('id_bank');
+      $amount = $request->input('amount');
+      $sort = $request->input('sort');
+      $rate = $request->input('rate');
+      $approve = $request->input('approve');
+      $sell = $request->input('sell');
+      $stavka = $request->input('stavka');
+
+      $banks = DB::table('banks')->orderBy('rate', 'desc');
+      if($srok) {
+        $banks = DB::table('banks')->where('srok_min','<=', $srok)->where('srok_max', '>=', $srok);
+      }
+      if($amount) {
+        $banks = DB::table('banks')->where('amount_min','<=', $amount)->where('amount_max', '>=', $amount);
+      }
+
+      if($id_bank) {
+        $banks = DB::table('banks')->where('id', $id_bank);
+      }
+      if($sort) {
+        if($sort === 'rate') {
+          $banks = DB::table('banks')->orderBy('rate','desc');
+        }
+        if($sort === 'approve') {
+          $banks = DB::table('banks')->orderBy('approve_percent', 'desc');
+        }
+        if($sort ==='sell') {
+          $banks = DB::table('banks')->orderBy('sell_quantity', 'desc');
+        }
+        if($sort === 'stavka') {
+          $banks = DB::table('banks')->orderBy('stavka', 'asc');
+        }
+      }
+
+      // if($rate) {
+      //   $banks = DB::table('banks')->orderBy('rate','desc');
+      // }
+      // if($approve) {
+      //   $banks = DB::table('banks')->orderBy('approve_percent', 'desc');
+      // }
+      // if($sell) {
+      //   $banks = DB::table('banks')->orderBy('sell_quantity', 'desc');
+      // }
+      // if($stavka) {
+      //   $banks = DB::table('banks')->orderBy('stavka', 'asc');
+      // }
+
+      $banks = $banks->paginate(15);
+
+    
+      return response()->json($banks);
+    }
+
+
+    public function bank($id) {
+      $result['success']  = false;
+      do {
+        if(!$id) {
+          $result['message'] = 'Не передан айди';
+          break;
+        }
+        $bank = DB::table('banks')->where('id', $id)->first();
+        $bank_detail = DB::table('bank_details')->where('bank_id', $id)->get();
+        $data  = BankDetailResource::collection($bank_detail);
+        $result['bank'] = $bank;
+        $result['data'] = $data;
+        $result['success'] = true;
+      } while (false);
+      return response()->json($result);
+    }
     // only Super Admin and Moderator(with permission add bank) can add banks
+   
+    
     public function add(Request $request) {
       $token = $request->input('token');
       $name = $request->input('name');
@@ -35,6 +136,14 @@ class BankController extends Controller
         $user_role = $this->getUserRole($token);
         $user_permissions = $this->getUserPermission($token);
       }
+      
+      $descripton = $request->input('description');
+      $background_img = $request->input('background_img');
+      $phone = $request->input('phone');
+      $email = $request->input('email');
+      $address = $request->input('address');
+      $documents = $request->input('documents');
+      $pension = $request->input('pension');
  
       $result['success'] = false;
 
@@ -56,36 +165,12 @@ class BankController extends Controller
           $result['message'] = 'У вас нету доступа сделать эту действие. Пожалуйста обращайтесь администратору!';
           break;
         }
-        if(!$name) {
-          $result['message'] = 'Имя не указан';
+        if(!$name || !$logo || !$amount_max || !$amount_min || !$srok_max || !$srok_min || !$stavka || !$approve_percent) {
+          $result['message']= 'Заполните все поля';
           break;
         }
-        if(!$logo) {
-          $result['message'] = 'Лого не указан';
-          break;
-        }
-        if(!$amount_min) {
-          $result['message'] = 'Мин. сумма не указан';
-          break;
-        }
-        if(!$amount_max) {
-          $result['message'] = 'Макс. сумма не указан';
-          break;
-        }
-        if(!$stavka) {
-          $result['message'] = 'Ставка не указан';
-          break;
-        }
-        if(!$srok_max) {
-          $result['message'] = 'Макс срок не указан';
-          break;
-        }
-        if(!$srok_min) {
-          $result['message'] = 'Мин. срок не указан';
-          break;
-        }
-        if(!$approve_percent) {
-          $result['message'] = 'Одобрение не указан';
+        if(!$descripton || !$background_img || !$phone || !$email || !$address || !$documents || !$pension) {
+          $result['message']= 'Заполните остальные все поля';
           break;
         }
 
@@ -109,6 +194,26 @@ class BankController extends Controller
             $result['message'] = 'Что то произошло не так попробуйте позже';
             break;
         }
+
+        $bank_detail = DB::table('bank_details')->insert(
+          array(
+            'bank_id'=>$new_bank,
+            'description'=>$descripton,
+            'background_img'=>$background_img,
+            'address'=>$address,
+            'email'=>$email,
+            'phone'=>$phone,
+            'documents'=>$documents,
+            'pension'=>$pension,
+            'created_at'=>Carbon::now(),
+            'updated_at'=>Carbon::now(),
+          )
+        );
+        if (!$bank_detail){
+          DB::rollback();
+          $result['message'] = 'Что то произошло не так попробуйте позже';
+          break;
+      }
         DB::commit();
         $result['success'] = true;
         $result['message'] = 'Успешно добавлен банк';
@@ -141,5 +246,10 @@ class BankController extends Controller
         array_push($permissions,$p->pivot->permission_id);
       }
       return $permissions;
+    }
+
+    private function returnMessage($var) {
+
+      return $var + ' не указан';
     }
 }

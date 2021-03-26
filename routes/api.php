@@ -16,8 +16,11 @@ use App\Http\Controllers\BankController;
 */
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+    return $request->user(); 
 });
 
 Route::get('/test',[BankController::class,'test']);
+Route::get('/banks', [BankController::class, 'banks']);
 Route::post('/banks',[BankController::class,'add']);
+Route::get('/bankCount', [BankController::class, 'bankResult']);
+Route::get('/banks/{id} ', [BankController::class,'bank']);
