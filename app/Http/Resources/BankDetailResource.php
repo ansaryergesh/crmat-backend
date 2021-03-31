@@ -15,7 +15,7 @@ class BankDetailResource extends JsonResource
     public function toArray($request)
     {
         $array = [
-          'id' => $this->id,
+          'bank_id' => $this->id,
           'description' => $this->description,
           'background_img' => $this->background_img,
           'address'=> $this->address,
@@ -24,5 +24,7 @@ class BankDetailResource extends JsonResource
           'documents' => $this->documents,
           'pension' => $this->pension,  
         ];
+
+        return $array;
     }
 }
