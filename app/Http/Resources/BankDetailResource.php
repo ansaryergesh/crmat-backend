@@ -22,7 +22,8 @@ class BankDetailResource extends JsonResource
           'email' => $this->email,
           'phone' => $this->phone,
           'documents' => $this->documents,
-          'pension' => $this->pension,  
+          'pension' => $this->pension,
+          'url' => $this->url,
         ];
 
         return $array;

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BankController;
+use App\Http\Controllers\MfoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,3 +31,9 @@ Route::get('/banks', [BankController::class, 'banks']);
 Route::post('/banks',[BankController::class,'add']);
 Route::get('/bankCount', [BankController::class, 'bankResult']);
 Route::get('/banks/{id} ', [BankController::class,'bank']);
+Route::put('/banks/{id}', [BankController::class, 'edit']);
+Route::get('/mfo', [MfoController::class, 'index']);
+Route::post('/mfo',[MfoController::class,'add']);
+Route::get('/mfo/{id} ', [MfoController::class,'mfo']);
+Route::put('/mfo/{id}', [MfoController::class, 'edit']);
+Route::put('/mfoArchive', [MfoController::class, 'archive']);

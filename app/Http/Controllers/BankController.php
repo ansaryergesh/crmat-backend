@@ -31,7 +31,7 @@ class BankController extends Controller
       $sell = $request->input('sell');
       $stavka = $request->input('stavka');
 
-      $banks = DB::table('banks');
+      $banks = DB::table('banks')->where('active', true);
       if($srok) {
         $banks = DB::table('banks')->where('srok_min','<=', $srok)->where('srok_max', '>=', $srok);
       }
@@ -113,6 +113,7 @@ class BankController extends Controller
           $result['message'] = 'У вас нету доступа сделать эту действие. Пожалуйста обращайтесь администратору!';
           break;
         }
+        $bank = DB::table('banks')->where('id', $id);
 
         if(!$bank) {
           $result['message'] = 'по этой айди не найден банк';
@@ -149,6 +150,7 @@ class BankController extends Controller
       $token = $request->input('token');
       $name = $request->input('name');
       $logo = $request->input('logo');
+      $url = $request->input('url');
       $amount_min = $request->input('amount_min');
       $amount_max = $request->input('amount_max');
       $srok_min = $request->input('srok_min');
@@ -194,7 +196,7 @@ class BankController extends Controller
           $result['message']= 'Заполните все поля';
           break;
         }
-        if(!$descripton || !$background_img || !$phone || !$email || !$address || !$documents || !$pension) {
+        if(!$url || !$descripton || !$background_img || !$phone || !$email || !$address || !$documents || !$pension) {
           $result['message']= 'Заполните остальные все поля';
           break;
         }
@@ -228,6 +230,7 @@ class BankController extends Controller
             'address'=>$address,
             'email'=>$email,
             'phone'=>$phone,
+            'url'=>$url,
             'documents'=>$documents,
             'pension'=>$pension,
             'created_at'=>Carbon::now(),
@@ -298,6 +301,7 @@ class BankController extends Controller
           $result['message']= 'Заполните все поля';
           break;
         }
+      
         if(!$descripton || !$background_img || !$phone || !$email || !$address || !$documents || !$pension) {
           $result['message']= 'Заполните остальные все поля';
           break;

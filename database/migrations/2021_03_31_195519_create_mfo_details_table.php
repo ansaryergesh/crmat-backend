@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBankDetailsTable extends Migration
+class CreateMfoDetailsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,17 @@ class CreateBankDetailsTable extends Migration
      */
     public function up()
     {
-        Schema::create('bank_details', function (Blueprint $table) {
+        Schema::create('mfo_details', function (Blueprint $table) {
             $table->id();
+            $table->integer('mfo_id');
             $table->timestamps();
-            $table->integer('bank_id');
             $table->string('description');
-            $table->string('background_img');
-            $table->string('address');
-            $table->string('email');
+            $table->string('backgroun_img');
             $table->string('phone');
             $table->string('documents');
-            $table->string('pension');
+            $table->string('address');
+            $table->string('email');
             $table->string('url');
-            $table->boolean('active')->default(true);
         });
     }
 
@@ -36,6 +34,6 @@ class CreateBankDetailsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bank_details');
+        Schema::dropIfExists('mfo_details');
     }
 }
