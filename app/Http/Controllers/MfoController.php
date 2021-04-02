@@ -26,9 +26,9 @@ class MfoController extends Controller
         $sell = $request->input('sell');
         $stavka = $request->input('stavka');
         $archive = $request->input('archive');
-        if($archive===true) {
+        if($archive==='1') {
             $mfos = DB::table('mfos')->where('active', false);
-        }else {
+        }if (!$archive) {
           $mfos = DB::table('mfos')->where('active', true);
         }
         if($srok) {
@@ -95,10 +95,13 @@ class MfoController extends Controller
             // Active or not
             $status = DB::table('mfos')->where('id', $id)->select('active')->get();
             $status = $status[0]->active;
+            $status_name ='';
             if($status === 0) {
                 $status = true;
+                $status_name = 'отправлен в Актив';
             }else {
                 $status = false;
+                $status_name = 'отправлен в Архив';
             };
 
             // Active or not end
@@ -114,7 +117,7 @@ class MfoController extends Controller
               };
               DB::commit();
               $result['success'] = true;
-              $result['message'] = 'статус МФО изменен в архив';
+              $result['message'] = $status_name;
     
             $result['success'] = true;
     
@@ -295,7 +298,7 @@ class MfoController extends Controller
         $srok_max = $request->input('srok_max');
         $stavka = $request->input('stavka');
         $approve_percent = $request->input('approve_percent');
-        $review_time = $request->input('revi$review_time');
+        $review_time = $request->input('review_time');
         $user_role = null;
         $user_permissions = null;
         if($this->checkUser($token)) {
@@ -328,6 +331,10 @@ class MfoController extends Controller
           if($user_role===3 && !in_array('4', $user_permissions)) {
             $result['message'] = 'У вас нету доступа сделать эту действие. Пожалуйста обращайтесь администратору!';
             break;
+          }
+          if(!$review_time) {
+              $result['message'] = 'Этот';
+              break;
           }
           if(!$name || !$logo || !$amount_max || !$amount_min || !$srok_max || !$srok_min || !$stavka || !$approve_percent || !$review_time) {
             $result['message']= 'Заполните все поля';

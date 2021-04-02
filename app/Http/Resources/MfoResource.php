@@ -26,6 +26,8 @@ class MfoResource extends JsonResource
           'approve_percent' => $this->approve_percent,
           'review_time' => $this->review_time,
           'stavka' => $this->stavka,
+          'active' => $this->active,
+          'details' => MfoDetailResource::collection(DB::table('mfo_details')->where('mfo_id',$this->id)->get()),
         ];
 
         return $array;

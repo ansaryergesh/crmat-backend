@@ -22,7 +22,6 @@ class MfoDetailResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'documents' => $this->documents,
-            'details' => MfoDetailResource::collection(DB::table('mfo_details')->where('mfo_id',$this->id)->get()),
           ];
   
           return $array;
