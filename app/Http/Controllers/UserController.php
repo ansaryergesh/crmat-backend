@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-use DB;
+
 use App\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -12,17 +13,19 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $users = DB::table('users')->get();
         return response()->json($users);
     }
 
-    public function getProfile(Request $request) {
+    public function getProfile(Request $request)
+    {
         $token = $request->input('token');
         $result['success'] = false;
 
         do {
-            if(!$token) {
+            if (!$token) {
                 $result['message'] = 'Не передан токен';
                 break;
             }
@@ -35,15 +38,16 @@ class UserController extends Controller
             $result['name'] = $user->name;
             $result['email'] = $user->email;
             $result['id'] = $user->id;
-            $result['roles'] =$this->getUserRole($token);
+            $result['roles'] = $this->getUserRole($token);
             $result['permissions'] = $this->getUserPermission($token);
             $result['success'] = true;
-        }while (false);
+        } while (false);
 
         return response()->json($result);
     }
 
-    public function editOwn(Request $request) {
+    public function editOwn(Request $request)
+    {
         $token = $request->input('token');
         $email = $request->input('email');
         $user_name = $request->input('name');
@@ -67,12 +71,12 @@ class UserController extends Controller
             }
 
             $user = User::where('id', $user_id)->first();
-            $user->email=$email;
-            $user->name=$user_name;
+            $user->email = $email;
+            $user->name = $user_name;
             $user->save();
             $result['success'] = true;
             $result['message'] = 'Успешно обновлен!';
-        }while(false);
+        } while (false);
         return response()->json($result);
     }
 
@@ -135,58 +139,63 @@ class UserController extends Controller
         } while (false);
         return response()->json($result);
     }
-    
-    public function changePassword(Request $request){
+
+    public function changePassword(Request $request)
+    {
         $password = $request->input('password');
         $token = $request->input('token');
         $result['success'] = false;
 
-        do{
-            if (!$password){
+        do {
+            if (!$password) {
                 $result['message'] = 'Не передан пароль';
                 break;
             }
-         
-            if (!$token){
+
+            if (!$token) {
                 $result['message'] = 'Не передан токен';
                 break;
             }
 
-            $user = User::where('remember_token',$token)->first();
-            if (!$user){
+            $user = User::where('remember_token', $token)->first();
+            if (!$user) {
                 $result['message'] = 'Не найден токен';
                 break;
             }
             $user->password = bcrypt($password);
             $user->save();
             $result['success'] = true;
-        }while(false);
+        } while (false);
 
         return response()->json($result);
     }
 
-    private function checkUser($token) {
+    private function checkUser($token)
+    {
         $user = User::where('remember_token', $token)->first();
-        if($user){
-          return true;
-        }else {
-          return false;
+        if ($user) {
+            return true;
+        } else {
+            return false;
         }
-      }
-      private function getUserRole($token) {
+    }
+
+    private function getUserRole($token)
+    {
         $user = User::where('remember_token', $token)->first();
-        $role=$user->roles[0]->id;
+        $role = $user->roles[0]->id;
         return $role;
-      }
-  
-      private function getUserPermission($token) {
-        $permissions= [];
+    }
+
+    private function getUserPermission($token)
+    {
+        $permissions = [];
         $user = User::where('remember_token', $token)->first();
-        $permission=$user->getAllPermissions();
-        foreach($permission as $p) {
-          array_push($permissions,$p->pivot->permission_id);
+        $permission = $user->getAllPermissions();
+        foreach ($permission as $p) {
+            array_push($permissions, $p->pivot->permission_id);
         }
         return $permissions;
-      }
-  
+    }
+
 }

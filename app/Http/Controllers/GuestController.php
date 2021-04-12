@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
-use DB;
+
 use Carbon\Carbon;
 use App\Guest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GuestController extends Controller
 {
@@ -33,61 +34,62 @@ class GuestController extends Controller
         $organization_id = $request->input('organization_id');
         $result['success'] = false;
         $user = DB::table('guests')->where('iin', $iin)->first();
-        
-        DB::beginTransaction();
+
+
         do {
-          if($user) {
-            $uslugi_user = DB::table('guest_uslugis')->insert(
-              array(
-                'guest_id'=>$user->id,
-                'service_id'=>$service_id,
-                'organization_id'=>$organization_id,
-              )
-            );
-            if(!$uslugi_user) {
-              DB::rollback();
-              $result['message'] = 'Что то пошло не так';
-            }
-        }
-        else {
-            $new_guest = DB::table('guests')->insertGetId(
-                array(
-                    'fio'=>$fio,
-                    'email'=>$email,
-                    'iin'=>$iin,
-                    'phone'=>$phone,
-                )
-            );
+            DB::beginTransaction();
+            if ($user) {
+                $uslugi_user = DB::table('guest_uslugis')->insert(
+                    array(
+                        'guest_id' => $user->id,
+                        'service_id' => $service_id,
+                        'organization_id' => $organization_id,
+                    )
+                );
+                if (!$uslugi_user) {
+                    DB::rollback();
+                    $result['message'] = 'Что то пошло не так';
+                }
+            } else {
+                $new_guest = DB::table('guests')->insertGetId(
+                    array(
+                        'fio' => $fio,
+                        'email' => $email,
+                        'iin' => $iin,
+                        'phone' => $phone,
+                    )
+                );
 
-            if(!$new_guest) {
-                DB::rollback();
-                $result['message'] = 'Что то пошло не так';
-            }
+                if (!$new_guest) {
+                    DB::rollback();
+                    $result['message'] = 'Что то пошло не так';
+                }
 
-            $uslugi_user = DB::table('guest_uslugis')->insert(
-              array(
-                'guest_id'=>$new_guest,
-                'service_id'=>$service_id,
-                'organization_id'=>$organization_id,
-              )
-            );
+                $uslugi_user = DB::table('guest_uslugis')->insert(
+                    array(
+                        'guest_id' => $new_guest,
+                        'service_id' => $service_id,
+                        'organization_id' => $organization_id,
+                    )
+                );
 
-            if(!$uslugi_user) {
-              DB::rollback();
-              $result['message'] = 'Что то пошло не так';
+                if (!$uslugi_user) {
+                    DB::rollback();
+                    $result['message'] = 'Что то пошло не так';
+                }
             }
-        }
-          DB::commit();
-          $result['success'] = true;
-          $result['message'] = 'Добавлен и перенаправлен';
-        }while(false);
+            DB::commit();
+            $result['success'] = true;
+            $result['message'] = 'Добавлен и перенаправлен';
+        } while (false);
+
         return response()->json($result);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -98,7 +100,7 @@ class GuestController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Guest  $guest
+     * @param \App\Guest $guest
      * @return \Illuminate\Http\Response
      */
     public function show(Guest $guest)
@@ -109,7 +111,7 @@ class GuestController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Guest  $guest
+     * @param \App\Guest $guest
      * @return \Illuminate\Http\Response
      */
     public function edit(Guest $guest)
@@ -120,8 +122,8 @@ class GuestController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Guest  $guest
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Guest $guest
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Guest $guest)
@@ -132,7 +134,7 @@ class GuestController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Guest  $guest
+     * @param \App\Guest $guest
      * @return \Illuminate\Http\Response
      */
     public function destroy(Guest $guest)
